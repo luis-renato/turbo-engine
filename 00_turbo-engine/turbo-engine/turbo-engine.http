@@ -1,0 +1,6 @@
+@turbo_engine_HostAddress = http://localhost:5157
+
+GET {{turbo_engine_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
