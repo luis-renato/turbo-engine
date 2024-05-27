@@ -1,15 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using turbo_engine.Model;
+﻿using turbo_engine.Model;
 
-namespace turbo_engine.Repository
+namespace turbo_engine.Business
 {
-    public interface IPersonRepository
-    {
+    public interface IPersonBusiness
+    { 
         Person Create(Person person);
         Person FindByID(long id);
         List<Person> FindAll();
         Person Update(Person person);
         void Delete(long id);
-        bool Exists(long id);
     }
 }

@@ -1,9 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using EvolveDb;
-using Serilog;
-using MySqlConnector;
 using turbo_engine.Business.Implementations;
 using turbo_engine.Business;
+using Microsoft.EntityFrameworkCore;
 using turbo_engine.Model.Context;
 using turbo_engine.Repository.Implementations;
 using turbo_engine.Repository;
@@ -20,12 +17,6 @@ builder.Services.AddDbContext<MySQLContext>(options => options.UseMySql(
     new MySqlServerVersion(new Version(8, 0, 29)))
 );
 
-if (builder.Environment.IsDevelopment())
-{
-    MigrateDatabase(connection);
-}
-
-//Versioning API
 builder.Services.AddApiVersioning();
 
 //Dependency Injection
@@ -43,22 +34,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-void MigrateDatabase(string connection)
-{
-    try
-    {
-        var evolveConnection = new MySqlConnection(connection);
-        var evolve = new Evolve(evolveConnection, Log.Information)
-        {
-            Locations = new List<string> { "db/migrations", "db/dataset" },
-            IsEraseDisabled = true,
-        };
-        evolve.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Log.Error("Database migration failed", ex);
-        throw;
-    }
-}
