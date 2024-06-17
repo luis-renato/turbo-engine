@@ -10,11 +10,20 @@ using turbo_engine.Repository.Generic;
 using Microsoft.Net.Http.Headers;
 using turbo_engine.HyperMedia.Filters;
 using turbo_engine.HyperMedia.Enricher;
+using System.Reflection;
+using System.ComponentModel;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Rewrite;
 
 var builder = WebApplication.CreateBuilder(args);
+var appName = "Testeeeee";
+var appVersion = "v1";
+var appDescription = $"Descrição de '{appName}'";
 
 // Add services to the container.
-
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllers();
 
 var connection = builder.Configuration["MySQLConnection:MySQLConnectionString"];
@@ -46,6 +55,21 @@ builder.Services.AddSingleton(filterOptions);
 //Versioning API
 builder.Services.AddApiVersioning();
 
+builder.Services.AddSwaggerGen(c => {
+    c.SwaggerDoc(appVersion,
+    new OpenApiInfo
+    {
+            Title = appName,
+            Version = appVersion,
+            Description = appDescription,
+            Contact = new OpenApiContact
+            {
+                Name = "Luis",
+                Url = new Uri("https://api.luisrenato.com.br")
+            }
+        });
+});
+
 //Dependency Injection
 builder.Services.AddScoped<IPersonBusiness, PersonBusinessImplementation>();
 builder.Services.AddScoped<IBookBusiness, BookBusinessImplementation>();
@@ -56,6 +80,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
+
+//Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{appName} - {appVersion}"); });
+var option = new RewriteOptions();
+option.AddRedirect("^$", "swagger");
+app.UseRewriter(option);
+
 
 app.UseAuthorization();
 
